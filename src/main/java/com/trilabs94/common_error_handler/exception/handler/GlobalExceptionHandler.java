@@ -1,6 +1,7 @@
 package com.trilabs94.common_error_handler.exception.handler;
 
 import com.trilabs94.common_error_handler.dto.ErrorResponseDto;
+import com.trilabs94.common_error_handler.exception.BusinessException;
 import com.trilabs94.common_error_handler.exception.ResourceAlreadyExistsException;
 import com.trilabs94.common_error_handler.exception.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
@@ -46,6 +47,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleCustomerAlreadyExistsException(ResourceAlreadyExistsException exception, WebRequest webRequest) {
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .errorTimeStamp(java.time.LocalDateTime.now())
+                .errorMessage(exception.getMessage())
+                .errorCode(HttpStatus.BAD_REQUEST)
+                .uri(webRequest.getDescription(false))
+                .build();
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponseDto> handleBusinessException(BusinessException exception, WebRequest webRequest) {
         ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
                 .errorTimeStamp(java.time.LocalDateTime.now())
                 .errorMessage(exception.getMessage())
